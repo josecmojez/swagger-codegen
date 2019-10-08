@@ -1,7 +1,21 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
+    {{#parentArtifactId}}
+    <parent>
+        {{#parentGroupId}}
+        <groupId>{{parentGroupId}}</groupId>
+        {{/parentGroupId}}
+        {{^parentGroupId}}
+        <groupId>{{groupId}}</groupId>
+        {{/parentGroupId}}
+        <artifactId>{{parentArtifactId}}</artifactId>
+        <version>{{parentVersion}}</version>
+    </parent>
+    {{/parentArtifactId}}
+    {{^parentGroupId}}
     <groupId>{{groupId}}</groupId>
+    {{/parentGroupId}}
     <artifactId>{{artifactId}}</artifactId>
     <packaging>jar</packaging>
     <name>{{artifactId}}</name>
@@ -31,12 +45,12 @@
         </developer>
     </developers>
 
+    {{^parentGroupId}}
     <build>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-enforcer-plugin</artifactId>
-                <version>3.0.0-M1</version>
                 <executions>
                     <execution>
                         <id>enforce-maven</id>
@@ -56,7 +70,6 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>2.12</version>
                 <configuration>
                     <systemProperties>
                         <property>
@@ -88,7 +101,6 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
-                <version>2.2</version>
                 <executions>
                     <execution>
                         <goals>
@@ -104,7 +116,6 @@
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>build-helper-maven-plugin</artifactId>
-                <version>1.10</version>
                 <executions>
                     <execution>
                         <id>add_sources</id>
@@ -137,7 +148,6 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
-                <version>2.10.4</version>
                 <executions>
                     <execution>
                         <id>attach-javadocs</id>
@@ -150,7 +160,6 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-source-plugin</artifactId>
-                <version>2.2.1</version>
                 <executions>
                     <execution>
                         <id>attach-sources</id>
@@ -162,7 +171,7 @@
             </plugin>
         </plugins>
     </build>
-
+    {{/parentGroupId}}
     <profiles>
         <profile>
             <id>sign-artifacts</id>
@@ -171,7 +180,6 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-gpg-plugin</artifactId>
-                        <version>1.5</version>
                         <executions>
                             <execution>
                                 <id>sign-artifacts</id>
@@ -188,49 +196,47 @@
     </profiles>
 
     <dependencies>
+
+        <dependency>
+            <groupId>br.com.asappay.backpay</groupId>
+            <artifactId>backpay-api-common</artifactId>
+            <version>${backpay.api.common.version}</version>
+        </dependency>
         <dependency>
             <groupId>io.swagger</groupId>
             <artifactId>swagger-annotations</artifactId>
-            <version>${swagger-core-version}</version>
         </dependency>
 
         <!-- HTTP client: Netflix Feign -->
         <dependency>
             <groupId>io.github.openfeign</groupId>
             <artifactId>feign-core</artifactId>
-            <version>${feign-version}</version>
         </dependency>
         <dependency>
             <groupId>io.github.openfeign</groupId>
             <artifactId>feign-jackson</artifactId>
-            <version>${feign-version}</version>
         </dependency>
         <dependency>
             <groupId>io.github.openfeign</groupId>
             <artifactId>feign-slf4j</artifactId>
-            <version>${feign-version}</version>
         </dependency>
         <dependency>
             <groupId>io.github.openfeign.form</groupId>
             <artifactId>feign-form</artifactId>
-            <version>${feign-form-version}</version>
         </dependency>
 
         <!-- JSON processing: jackson -->
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-core</artifactId>
-            <version>${jackson-version}</version>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-annotations</artifactId>
-            <version>${jackson-version}</version>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
-            <version>${jackson-version}</version>
         </dependency>
         {{#withXml}}
 
@@ -238,7 +244,6 @@
             <dependency>
                 <groupId>com.fasterxml.jackson.dataformat</groupId>
                 <artifactId>jackson-dataformat-xml</artifactId>
-                <version>${jackson-version}</version>
             </dependency>
 
         {{/withXml}}
@@ -246,14 +251,12 @@
             <dependency>
                 <groupId>com.fasterxml.jackson.datatype</groupId>
                 <artifactId>jackson-datatype-joda</artifactId>
-                <version>${jackson-version}</version>
             </dependency>
         {{/joda}}
         {{#java8}}
             <dependency>
                 <groupId>com.fasterxml.jackson.datatype</groupId>
                 <artifactId>jackson-datatype-jsr310</artifactId>
-                <version>${jackson-version}</version>
             </dependency>
         {{/java8}}
         {{#threetenbp}}
@@ -266,26 +269,22 @@
         <dependency>
             <groupId>org.apache.oltu.oauth2</groupId>
             <artifactId>org.apache.oltu.oauth2.client</artifactId>
-            <version>${oltu-version}</version>
         </dependency>
 
         <!-- test dependencies -->
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>${junit-version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>com.squareup.okhttp3</groupId>
             <artifactId>mockwebserver</artifactId>
-            <version>3.6.0</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.assertj</groupId>
             <artifactId>assertj-core</artifactId>
-            <version>1.7.1</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
@@ -294,15 +293,9 @@
         <java.version>{{#java8}}1.8{{/java8}}{{^java8}}1.7{{/java8}}</java.version>
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <maven.compiler.target>${java.version}</maven.compiler.target>
-        <swagger-core-version>1.5.18</swagger-core-version>
-        <feign-version>9.4.0</feign-version>
-        <feign-form-version>2.1.0</feign-form-version>
-        <jackson-version>2.9.9</jackson-version>
+        <backpay.api.common.version>1.0.0-SNAPSHOT</backpay.api.common.version>
         {{#threetenbp}}
             <jackson-threetenbp-version>2.6.4</jackson-threetenbp-version>
         {{/threetenbp}}
-        <junit-version>4.12</junit-version>
-        <maven-plugin-version>1.0.0</maven-plugin-version>
-        <oltu-version>1.0.1</oltu-version>
     </properties>
 </project>

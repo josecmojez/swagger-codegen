@@ -31,9 +31,10 @@ import feign.slf4j.Slf4jLogger;
 import {{invokerPackage}}.auth.*;
 import {{invokerPackage}}.auth.OAuth.AccessTokenListener;
 
+import br.com.asappay.backpay.api.common.client.ApiBaseClient;
+
 {{>generatedAnnotation}}
-public class ApiClient {
-  public interface Api {}
+public class ApiClient extends ApiBaseClient {
 
   protected ObjectMapper objectMapper;
   private String basePath = "{{{basePath}}}";
@@ -187,6 +188,7 @@ public class ApiClient {
    * @param clientClass Client class
    * @return The Client
    */
+  @Override
   public <T extends Api> T buildClient(Class<T> clientClass) {
     return feignBuilder.target(clientClass, basePath);
   }

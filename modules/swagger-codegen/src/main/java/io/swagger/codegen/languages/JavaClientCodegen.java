@@ -33,6 +33,16 @@ public class JavaClientCodegen extends AbstractJavaCodegen
     public static final String PLAY_VERSION = "playVersion";
     public static final String PARCELABLE_MODEL = "parcelableModel";
     public static final String USE_RUNTIME_EXCEPTION = "useRuntimeException";
+    
+    /* ASAPPAY CONSTANTS */
+    public static final String APICLIENT_ALIAS = "apiClientAlias";
+    public static final String APICLIENT_ALIAS_DESC = "Apelido da API Client";
+    public static final String MAVEN_PARENT_ARTIFACT_ID = "parentArtifactId";
+    public static final String MAVEN_PARENT_ARTIFACT_ID_DESC = "Nome do artefato pai";
+    public static final String MAVEN_PARENT_GROUP_ID = "parentGroupId";
+    public static final String MAVEN_PARENT_GROUP_ID_DESC = "Nome do grupo do artefato pai (opcional)";
+    public static final String MAVEN_PARENT_VERSION = "parentVersion";
+    public static final String MAVEN_PARENT_VERSION_DESC = "Versão do artefato pai";
 
     public static final String PLAY_24 = "play24";
     public static final String PLAY_25 = "play25";
@@ -73,6 +83,11 @@ public class JavaClientCodegen extends AbstractJavaCodegen
         cliOptions.add(CliOption.newBoolean(PERFORM_BEANVALIDATION, "Perform BeanValidation"));
         cliOptions.add(CliOption.newBoolean(USE_GZIP_FEATURE, "Send gzip-encoded requests"));
         cliOptions.add(CliOption.newBoolean(USE_RUNTIME_EXCEPTION, "Use RuntimeException instead of Exception"));
+        cliOptions.add(CliOption.newString(APICLIENT_ALIAS, APICLIENT_ALIAS_DESC));
+        cliOptions.add(CliOption.newString(MAVEN_PARENT_ARTIFACT_ID, MAVEN_PARENT_ARTIFACT_ID_DESC));
+        cliOptions.add(CliOption.newString(MAVEN_PARENT_GROUP_ID, MAVEN_PARENT_GROUP_ID_DESC));
+        cliOptions.add(CliOption.newString(MAVEN_PARENT_VERSION, MAVEN_PARENT_VERSION_DESC));
+
 
         supportedLibraries.put("jersey1", "HTTP client: Jersey client 1.19.4. JSON processing: Jackson 2.9.9. Enable Java6 support using '-DsupportJava6=true'. Enable gzip request encoding using '-DuseGzipFeature=true'.");
         supportedLibraries.put("feign", "HTTP client: OpenFeign 9.4.0. JSON processing: Jackson 2.9.9");
@@ -157,11 +172,13 @@ public class JavaClientCodegen extends AbstractJavaCodegen
             this.setUseRuntimeException(convertPropertyToBooleanAndWriteBack(USE_RUNTIME_EXCEPTION));
         }
 
+
         final String invokerFolder = (sourceFolder + '/' + invokerPackage).replace(".", "/");
         final String authFolder = (sourceFolder + '/' + invokerPackage + ".auth").replace(".", "/");
         final String apiFolder = (sourceFolder + '/' + apiPackage).replace(".", "/");
 
         //Common files
+        writeOptional(outputFolder, new SupportingFile("logo-asappay-small.png", "logo-asappay-small.png"));
         writeOptional(outputFolder, new SupportingFile("pom.mustache", "", "pom.xml"));
         writeOptional(outputFolder, new SupportingFile("README.mustache", "", "README.md"));
         writeOptional(outputFolder, new SupportingFile("build.gradle.mustache", "", "build.gradle"));
@@ -213,6 +230,7 @@ public class JavaClientCodegen extends AbstractJavaCodegen
             additionalProperties.put("jackson", "true");
             supportingFiles.add(new SupportingFile("ParamExpander.mustache", invokerFolder, "ParamExpander.java"));
             supportingFiles.add(new SupportingFile("EncodingUtils.mustache", invokerFolder, "EncodingUtils.java"));
+            supportingFiles.add(new SupportingFile("ApiRegistry.mustache", invokerFolder, "ApiRegistry.java"));
         } else if ("okhttp-gson".equals(getLibrary()) || StringUtils.isEmpty(getLibrary())) {
             // the "okhttp-gson" library template requires "ApiCallback.mustache" for async call
             supportingFiles.add(new SupportingFile("ApiCallback.mustache", invokerFolder, "ApiCallback.java"));

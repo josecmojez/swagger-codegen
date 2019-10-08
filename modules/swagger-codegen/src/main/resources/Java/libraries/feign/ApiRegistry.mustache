@@ -1,0 +1,50 @@
+package {{invokerPackage}};
+
+import br.com.asappay.backpay.api.common.client.ApiBaseClient;
+import br.com.asappay.backpay.api.common.client.ApiClientManager;
+import br.com.asappay.backpay.api.common.client.ApiClientRegistry;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
+
+import java.util.Objects;
+import java.util.Optional;
+
+@Slf4j
+@Component("{{apiClientAlias}}ApiRegistry")
+@Data
+@EqualsAndHashCode(callSuper = true)
+public class ApiRegistry extends ApiClientRegistry<ApiClient> {
+
+    public ApiRegistry(ApiClientManager apiClientManager) {
+        super(apiClientManager);
+        this.setAlias("{{apiClientAlias}}Api");
+    }
+
+    @Override
+    public <T extends ApiBaseClient.Api> Optional<T> getApiInstance(Class<T> clazz) {
+        if (this.getApiClient() == null) {
+            // Verify OAuth or Http Basic authentication
+            if (Objects.nonNull(this.getApiClientConfig().getClientId()) &&
+                Objects.nonNull(this.getApiClientConfig().getSecret())) {
+                log.info("Identify OAuth authentication option");
+                this.setApiClient(new ApiClient(
+                        this.getApiClientConfig().getAuthName(),
+                        this.getApiClientConfig().getClientId(),
+                        this.getApiClientConfig().getSecret(),
+                        this.getApiClientConfig().getUsername(),
+                        this.getApiClientConfig().getPassword())
+                        .setBasePath(this.getApiClientConfig().getBasePath()));
+            } else {
+                log.info("Identify Http Basic authentication option");
+                this.setApiClient(new ApiClient(
+                        this.getApiClientConfig().getAuthName(),
+                        this.getApiClientConfig().getUsername(),
+                        this.getApiClientConfig().getPassword())
+                        .setBasePath(this.getApiClientConfig().getBasePath()));
+            }
+        }
+        return super.getApiInstance(clazz);
+    }
+}
